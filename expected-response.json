@@ -1,0 +1,21 @@
+send code payload (interpret solution):
+{
+    "lang": "cpp",
+    "question_id": "2",
+    "typed_code": "/**\n * Definition for singly-linked list.\n * struct ListNode {\n *     int val;\n *     ListNode *next;\n *     ListNode() : val(0), next(nullptr) {}\n *     ListNode(int x) : val(x), next(nullptr) {}\n *     ListNode(int x, ListNode *next) : val(x), next(next) {}\n * };\n */\nclass Solution {\npublic:\n    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {\n        ListNode* head = new ListNode((l1->val+l2->val)%10);\n        ListNode* ptr = head;\n        int carry = (l1->val+l2->val)/10;\n        l1 = l1->next;\n        l2 = l2-> next; \n        while(l1 || l2 || carry > 0){\n            if(l1 && l2){\n                ListNode* node = new ListNode((l1->val+l2->val+carry)%10);\n                ptr->next = node;\n                ptr = ptr->next;\n                carry = (l1->val+l2->val+carry)/10;\n                l1 = l1->next;\n                l2 = l2-> next; \n            }else if(!l1 && l2){\n                ListNode* node = new ListNode((l2->val+carry)%10);\n                ptr->next = node;\n                ptr = ptr->next;\n                carry = (l2->val+carry)/10;\n                l2 = l2->next;\n            }else if(!l2 && l1){\n                ListNode* node = new ListNode((l1->val+carry)%10);\n                ptr->next = node;\n                ptr = ptr->next;\n                carry = (l1->val+carry)/10;\n                l1 = l1->next;\n            }else if(carry > 0){\n                ListNode* node = new ListNode(carry);\n                ptr->next = node;\n                carry = 0;\n            }\n        }\n\n        return head;\n    }\n};",
+    "data_input": "[2,4,3]\n[5,6,4]\n[0]\n[0]\n[9,9,9,9,9,9,9]\n[9,9,9,9]"
+}
+
+send code response (interpret solution resposne):
+{
+    "interpret_id": "runcode_1701416508.1519372_OhtP8WDgv8",
+    "test_case": "[2,4,3]\n[5,6,4]\n[0]\n[0]\n[9,9,9,9,9,9,9]\n[9,9,9,9]"
+}
+
+get results response:
+{
+    "lang": "cpp",
+    "question_id": "2",
+    "typed_code": "/**\n * Definition for singly-linked list.\n * struct ListNode {\n *     int val;\n *     ListNode *next;\n *     ListNode() : val(0), next(nullptr) {}\n *     ListNode(int x) : val(x), next(nullptr) {}\n *     ListNode(int x, ListNode *next) : val(x), next(next) {}\n * };\n */\nclass Solution {\npublic:\n    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {\n        ListNode* head = new ListNode((l1->val+l2->val)%10);\n        ListNode* ptr = head;\n        int carry = (l1->val+l2->val)/10;\n        l1 = l1->next;\n        l2 = l2-> next; \n        while(l1 || l2 || carry > 0){\n            if(l1 && l2){\n                ListNode* node = new ListNode((l1->val+l2->val+carry)%10);\n                ptr->next = node;\n                ptr = ptr->next;\n                carry = (l1->val+l2->val+carry)/10;\n                l1 = l1->next;\n                l2 = l2-> next; \n            }else if(!l1 && l2){\n                ListNode* node = new ListNode((l2->val+carry)%10);\n                ptr->next = node;\n                ptr = ptr->next;\n                carry = (l2->val+carry)/10;\n                l2 = l2->next;\n            }else if(!l2 && l1){\n                ListNode* node = new ListNode((l1->val+carry)%10);\n                ptr->next = node;\n                ptr = ptr->next;\n                carry = (l1->val+carry)/10;\n                l1 = l1->next;\n            }else if(carry > 0){\n                ListNode* node = new ListNode(carry);\n                ptr->next = node;\n                carry = 0;\n            }\n        }\n\n        return head;\n    }\n};",
+    "data_input": "[2,4,3]\n[5,6,4]\n[0]\n[0]\n[9,9,9,9,9,9,9]\n[9,9,9,9]"
+}
