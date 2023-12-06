@@ -27,7 +27,7 @@ app.post("/runcode", (req, res) => {
   fs.writeFileSync("code.cpp", codeToCompile);
   fs.writeFileSync("input.txt", inputFileContent);
 
-  const compileCommand = `g++ code.cpp -o output.exe`;
+  const compileCommand = `g++ code.cpp -o output`;
   exec(compileCommand, (compileError, compileStdout, compileStderr) => {
     if (compileError) {
       res
