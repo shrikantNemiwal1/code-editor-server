@@ -34,7 +34,7 @@ app.post("/runcode", (req, res) => {
         .status(500)
         .json({ error: "Compilation error", details: compileStderr });
     } else {
-      const runCommand = "output < input.txt";
+      const runCommand = "./output < input.txt";
       exec(runCommand, (runError, runStdout, runStderr) => {
         if (runError) {
           res.status(500).json({ error: "Runtime error", details: runStderr });
