@@ -141,7 +141,7 @@ if (cluster.isPrimary) {
 
   function getRunCommand(language, codeFileName) {
     return {
-      "C++": "output < input.txt",
+      "C++": "./output < input.txt",
       Python: `python ${codeFileName} < input.txt`,
       Java: `java ${codeFileName.replace(".java", "")} < input.txt`,
       C: "output < input.txt",
