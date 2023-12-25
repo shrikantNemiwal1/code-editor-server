@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
-const port = 3000;
+const port = 80;
 const cluster = require("cluster");
 const totalCPUs = require("os").availableParallelism();
 const ErrorClass = require("./services/error");
@@ -299,6 +299,6 @@ if (cluster.isPrimary) {
   });
 
   app.listen(port, () => {
-    // console.log(`App listening on port ${port}`);
+    console.log(`App listening on port ${port}`);
   });
 }
