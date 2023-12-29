@@ -5,8 +5,11 @@ const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
 const port = 8080;
+
 // const cluster = require("cluster");
+
 // const totalCPUs = require("os").availableParallelism();
+
 const ErrorClass = require("./services/error");
 const { validateRequest } = require("./services/common.utils");
 const prettier = require("prettier");
@@ -24,20 +27,31 @@ const languages = [
 ];
 
 // if (cluster.isPrimary) {
+
 //   console.log(`Number of CPUs is ${totalCPUs}`);
+
 //   console.log(`Primary ${process.pid} is running`);
 
 //   // Fork workers.
+
 //   for (let i = 0; i < totalCPUs; i++) {
+
 //     cluster.fork();
+
 //   }
 
 //   cluster.on("exit", (worker, code, signal) => {
+
 //     console.log(`worker ${worker.process.pid} died`);
+
 //     console.log("Let's fork another worker!");
+
 //     cluster.fork();
+
 //   });
+
 // } else {
+
 const app = express();
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
@@ -49,6 +63,7 @@ app.get("/", (req, res) => {
 });
 
 const tempDir = "./temp/";
+
 if (!fs.existsSync(tempDir)) {
   fs.mkdirSync(tempDir);
 }
@@ -59,21 +74,16 @@ app.post("/formatcode", async (req, res) => {
       code: true,
       language: true,
     });
-
     if (isInvalidRequest) {
       throw new ErrorClass("Invalid request, check payload", 400);
     }
-
     const language = req.body.language;
+
     if (!languages.includes(language)) {
       throw new ErrorClass(`${language} language, Not found!`, 400);
     }
-
     const { code } = req.body;
-    console.log(code);
-
     const formattedCode = await formatCode(code, language);
-    console.log(formattedCode);
     res.json({ formattedCode });
   } catch (error) {
     console.error("Error processing request:", error.message);
@@ -93,25 +103,25 @@ async function formatCode(code, language) {
         console.error("Error running autopep8:", error.message);
         throw new ErrorClass("Error formatting Python code", 500);
       }
+
     case "Java":
-      const jarPath =
-        '"C:/Program Files/Java/google-java-format-1.19.1-all-deps.jar"';
+      const jarPath = "../google-java-format-1.19.1-all-deps.jar";
       const tempFilePath = path.join(tempDir, `temp_${Date.now()}.java`);
       fs.writeFileSync(tempFilePath, code, "utf-8");
 
       try {
-        execSync(`java -jar ${jarPath} --replace ${tempFilePath}`);
-
+        execSync(`java -jar ${jarPath} -i ${tempFilePath}`);
         const formattedContent = fs.readFileSync(tempFilePath, "utf-8");
         fs.unlinkSync(tempFilePath);
         return formattedContent;
       } catch (error) {
         console.error("Error running google-java-format:", error.message);
-
         fs.unlinkSync(tempFilePath);
         throw new ErrorClass("Error formatting Java code", 500);
       }
+
     case "C":
+
     case "C++":
       try {
         return execSync("clang-format -style=file", {
@@ -122,6 +132,7 @@ async function formatCode(code, language) {
         console.error("Error running clang-format:", error.message);
         throw new ErrorClass(`Error formatting ${language} code`, 500);
       }
+
     case "C#":
       try {
         exec(
@@ -130,9 +141,11 @@ async function formatCode(code, language) {
           (error, stdout, stderr) => {
             if (error) {
               console.error(stderr);
+
               throw new ErrorClass(`Error formatting ${language} code`, 500);
             } else {
               // Successful formatting
+
               return stdout;
             }
           }
@@ -141,17 +154,21 @@ async function formatCode(code, language) {
         console.log(error);
         throw new ErrorClass(`Error formatting ${language} code`, 500);
       }
+
     case "JavaScript":
       try {
         const formattedCode = await prettier.format(code, {
           semi: false,
+
           parser: "babel",
         });
         return formattedCode;
       } catch (error) {
         console.error("Error formatting JavaScript code:", error.message);
+
         throw new ErrorClass("Error formatting JavaScript code", 500);
       }
+
     case "Go":
       try {
         return execSync("gofmt", {
@@ -161,6 +178,22 @@ async function formatCode(code, language) {
       } catch (error) {
         console.error("Error running gofmt:", error.message);
         throw new ErrorClass("Error formatting Go code", 500);
+      }
+
+    case "Ruby":
+      try {
+        // Use rubocop to format the Ruby code
+        const formattedCode = execSync(
+          `echo '${code}' | rubocop --autocorrect`,
+          {
+            encoding: "utf-8",
+          }
+        );
+
+        return formattedCode.trim(); // Trim to remove leading/trailing whitespaces
+      } catch (error) {
+        console.error("Error running rubocop:", error.message);
+        throw new ErrorClass("Error formatting Ruby code", 500);
       }
   }
 }
@@ -176,13 +209,16 @@ app.post("/runcode", async (req, res) => {
     throw new ErrorClass("Invalid request, check payload", 400);
 
   const language = req.body.language;
+
   if (!languages.includes(language))
     throw new ErrorClass(`${language} language, Not found!`, 400);
 
   const codeFileName = getCodeFileName(language);
+
   const inputFileContent = req.body.input;
 
   fs.writeFileSync(codeFileName, req.body.code);
+
   fs.writeFileSync("input.txt", inputFileContent);
 
   const compileCommand = getCompileCommand(language, codeFileName);
@@ -224,7 +260,7 @@ function getCompileCommand(language, codeFileName) {
   return {
     "C++": `g++ ${codeFileName} -o output`,
     Java: `javac ${codeFileName}`,
-    C: `gcc ${codeFileName} -o output`,
+    C: `g++ ${codeFileName} -o output`,
     Go: `go build ${codeFileName}`,
     Kotlin: `kotlinc ${codeFileName} -include-runtime -d Program.jar`,
   }[language];
@@ -238,6 +274,7 @@ function executeRunCommand(
   requestBody
 ) {
   const runCommand = getRunCommand(language, codeFileName);
+
   exec(runCommand, (runError, runStdout, runStderr) => {
     if (runError) {
       handleError(res, "Runtime error", runStderr, requestBody);
@@ -256,13 +293,21 @@ function executeRunCommand(
 function getRunCommand(language, codeFileName) {
   return {
     "C++": "./output < input.txt",
-    Python: `python ${codeFileName} < input.txt`,
+
+    Python: `python3 ${codeFileName} < input.txt`,
+
     Java: `java ${codeFileName.replace(".java", "")} < input.txt`,
-    C: "output < input.txt",
+
+    C: "./output < input.txt",
+
     "C#": `dotnet script ${codeFileName} < input.txt`,
+
     JavaScript: `node ${codeFileName}`,
+
     Ruby: `ruby ${codeFileName} < input.txt`,
-    Go: `${codeFileName.replace(".go", "")} < input.txt`,
+
+    Go: `./${codeFileName.replace(".go", "")} < input.txt`,
+
     Kotlin: `java -jar Program.jar < input.txt`,
   }[language];
 }
@@ -270,24 +315,33 @@ function getRunCommand(language, codeFileName) {
 function handleError(res, errorType, details, requestBody) {
   res.status(200).json({
     success: false,
+
     errorType,
+
     output: details,
+
     code: requestBody.code,
+
     input: requestBody.input,
+
     language: requestBody.language,
   });
 }
 
 // Handling all other routes with a 404 error
+
 app.all("*", (req, res, next) => {
   next(new ErrorClass(`Requested URL ${req.path} not found!`, 404));
 });
 
 // Error handling middleware
+
 app.use((err, req, res, next) => {
   const errorCode = err.code || 500;
+
   res.status(errorCode).send({
     message: err.message || "Internal Server Error. Something went wrong!",
+
     status: errorCode,
   });
 });
@@ -295,4 +349,5 @@ app.use((err, req, res, next) => {
 app.listen(port, "0.0.0.0", () => {
   console.log(`App listening on port ${port}`);
 });
+
 // }
