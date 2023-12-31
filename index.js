@@ -5,6 +5,26 @@ const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
 const port = 8080;
+const https = require("https");
+
+const privateKey = fs.readFileSync(
+  "/etc/letsencrypt/live/yourdomain.com/privkey.pem",
+  "utf8"
+);
+const certificate = fs.readFileSync(
+  "/etc/letsencrypt/live/yourdomain.com/cert.pem",
+  "utf8"
+);
+const ca = fs.readFileSync(
+  "/etc/letsencrypt/live/yourdomain.com/fullchain.pem",
+  "utf8"
+);
+
+const credentials = {
+  key: privateKey,
+  cert: certificate,
+  ca: ca,
+};
 
 // const cluster = require("cluster");
 
@@ -346,7 +366,8 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(port, "0.0.0.0", () => {
+const server = https.createServer(credentials, app);
+server.listen(port, "0.0.0.0", () => {
   console.log(`App listening on port ${port}`);
 });
 
