@@ -8,15 +8,15 @@ const port = 8080;
 const https = require("https");
 
 const privateKey = fs.readFileSync(
-  "../etc/letsencrypt/live/codespaces.online/privkey.pem",
+  "/etc/letsencrypt/live/codespaces.online/privkey.pem",
   "utf8"
 );
 const certificate = fs.readFileSync(
-  "../etc/letsencrypt/live/codespaces.online/cert.pem",
+  "/etc/letsencrypt/live/codespaces.online/cert.pem",
   "utf8"
 );
 const ca = fs.readFileSync(
-  "../etc/letsencrypt/live/codespaces.online/fullchain.pem",
+  "/etc/letsencrypt/live/codespaces.online/fullchain.pem",
   "utf8"
 );
 
