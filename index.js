@@ -141,7 +141,6 @@ async function formatCode(code, language) {
       }
 
     case "C":
-
     case "C++":
       try {
         return execSync("clang-format -style=file", {
@@ -223,6 +222,11 @@ app.post("/runcode", async (req, res) => {
     code: true,
     input: true,
     language: true,
+  });
+
+  exec("kotlinc -version", (error, stdout, stderr) => {
+    console.log("Kotlin Version:", stdout);
+    // ... rest of your code
   });
 
   if (isInvalidRequest)
