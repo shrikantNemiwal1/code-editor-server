@@ -155,7 +155,7 @@ async function formatCode(code, language) {
     case "C#":
       try {
         exec(
-          `echo "${code}" | dotnet format --check -`,
+          `echo "${code}" | dotnet format --check`,
           { input: code },
           (error, stdout, stderr) => {
             if (error) {
